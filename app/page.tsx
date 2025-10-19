@@ -8,7 +8,7 @@ import { DebuggerControls } from "@/components/debugger-controls";
 import { TraceLog } from "@/components/trace-log";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TMState, Transition, ExecutionStep, MachineState } from "@/lib/types";
-// Tabs components are no longer needed
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"; // ShadCN Tabs
 
 export default function Home() {
   const [alphabet, setAlphabet] = useState<string[]>(["0", "1"]);
@@ -94,11 +94,8 @@ export default function Home() {
       newTape.set(prev.headPosition, transition.write);
 
       let newHeadPosition = prev.headPosition;
-      if (transition.direction === "L") {
-        newHeadPosition--;
-      } else if (transition.direction === "R") {
-        newHeadPosition++;
-      }
+      if (transition.direction === "L") newHeadPosition--;
+      else if (transition.direction === "R") newHeadPosition++;
 
       let result: "continued" | "accepted" | "rejected" | "undefined" =
         "continued";
@@ -188,11 +185,8 @@ export default function Home() {
         newTape.set(prev.headPosition, transition.write);
 
         let newHeadPosition = prev.headPosition;
-        if (transition.direction === "L") {
-          newHeadPosition--;
-        } else if (transition.direction === "R") {
-          newHeadPosition++;
-        }
+        if (transition.direction === "L") newHeadPosition--;
+        else if (transition.direction === "R") newHeadPosition++;
 
         let result: "continued" | "accepted" | "rejected" | "undefined" =
           "continued";
@@ -221,9 +215,7 @@ export default function Home() {
         };
 
         setTimeout(() => {
-          if (runningRef.current) {
-            runLoop();
-          }
+          if (runningRef.current) runLoop();
         }, speed);
 
         return {
@@ -254,9 +246,8 @@ export default function Home() {
   }, []);
 
   return (
-    // Set min-h-screen and flex-col to manage vertical space
     <div className="min-h-screen bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col">
-      <header className="text-center py-4 relative container mx-auto">
+      <header className="text-center py-4 container mx-auto sticky z-90 px-4">
         <div className="absolute right-4 top-4">
           <ThemeToggle />
         </div>
@@ -268,10 +259,9 @@ export default function Home() {
         </p>
       </header>
 
-      {/* Main content area: uses flex-1 to take up all remaining height */}
-      <div className="grid grid-cols-4 p-4 pt-0 h-[85vh]">
-        {/* Visual Canvas (3/4 width, static) */}
-        <div className="pr-2 col-span-3 h-full sticky top-0">
+      <div className="flex flex-col md:flex-row p-4 pt-0 flex-1">
+        {/* Canvas */}
+        <div className="md:pr-2 md:w-3/4 h-[70vh] md:h-[98vh] md:sticky top-0">
           <VisualCanvas
             states={states}
             transitions={transitions}
@@ -283,8 +273,8 @@ export default function Home() {
           />
         </div>
 
-        {/* Sidebar (1/4 width, scrollable) */}
-        <div className="pl-2 border-l col-span-1 border-slate-300 dark:border-slate-800 overflow-y-auto">
+        {/* Desktop sidebar */}
+        <div className="hidden md:block md:pl-2 md:w-1/4 border-l border-slate-300 dark:border-slate-800 overflow-y-auto">
           <div className="space-y-4 pb-4">
             <ParametersPanel
               alphabet={alphabet}
@@ -319,6 +309,58 @@ export default function Home() {
               haltReason={machineState.haltReason}
             />
           </div>
+        </div>
+
+        {/* Mobile tabs */}
+        <div className="md:hidden mt-4 w-full">
+          <Tabs defaultValue="parameters" className="w-full">
+            <TabsList className="w-full border-b border-slate-300 dark:border-slate-700">
+              <TabsTrigger value="parameters" className="flex-1 text-center">
+                Parameters
+              </TabsTrigger>
+              <TabsTrigger value="debug" className="flex-1 text-center">
+                Debug
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="parameters" className="mt-4 w-full">
+              <ParametersPanel
+                alphabet={alphabet}
+                tapeAlphabet={tapeAlphabet}
+                blankSymbol={blankSymbol}
+                states={states}
+                transitions={transitions}
+                onAlphabetChange={setAlphabet}
+                onTapeAlphabetChange={setTapeAlphabet}
+                onBlankSymbolChange={setBlankSymbol}
+                onStatesChange={setStates}
+              />
+            </TabsContent>
+
+            <TabsContent value="debug" className="mt-4 w-full space-y-4">
+              <TapeVisualization
+                tape={machineState.tape}
+                headPosition={machineState.headPosition}
+                blankSymbol={blankSymbol}
+                inputString={inputString}
+                onInputChange={setInputString}
+                onInitialize={initializeTape}
+              />
+              <DebuggerControls
+                isRunning={machineState.isRunning}
+                isHalted={machineState.isHalted}
+                speed={speed}
+                onRun={handleRun}
+                onStep={executeStep}
+                onReset={handleReset}
+                onSpeedChange={setSpeed}
+              />
+              <TraceLog
+                steps={machineState.steps}
+                haltReason={machineState.haltReason}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>
