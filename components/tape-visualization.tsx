@@ -47,8 +47,15 @@ export function TapeVisualization({
     }
   }, [headPosition]);
 
-  const minVisible = headPosition - 7;
-  const maxVisible = headPosition + 7;
+  const tapeIndices = Array.from(tape.keys());
+
+  const minWritten = tapeIndices.length > 0 ? Math.min(...tapeIndices) : 0;
+  const maxWritten = tapeIndices.length > 0 ? Math.max(...tapeIndices) : 0;
+
+  const buffer = 10;
+
+  const minVisible = Math.min(minWritten, headPosition) - buffer;
+  const maxVisible = Math.max(maxWritten, headPosition) + buffer;
 
   const visibleCells = [];
   for (let i = minVisible; i <= maxVisible; i++) {

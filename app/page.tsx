@@ -8,7 +8,7 @@ import { DebuggerControls } from "@/components/debugger-controls";
 import { TraceLog } from "@/components/trace-log";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { TMState, Transition, ExecutionStep, MachineState } from "@/lib/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// Tabs components are no longer needed
 
 export default function Home() {
   const [alphabet, setAlphabet] = useState<string[]>(["0", "1"]);
@@ -254,95 +254,72 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-200 text-slate-900 dark:bg-slate-950  dark:text-slate-100 ">
-      <div className="container mx-auto p-4 space-y-4">
-        <header className="text-center py-6 relative">
-          <div className="absolute right-0 top-6">
-            <ThemeToggle />
+    // Set min-h-screen and flex-col to manage vertical space
+    <div className="min-h-screen bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100 flex flex-col">
+      <header className="text-center py-4 relative container mx-auto">
+        <div className="absolute right-4 top-4">
+          <ThemeToggle />
+        </div>
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
+          Turing Machine Builder & Visualizer
+        </h1>
+        <p className="text-slate-400 mt-1 text-sm">
+          Design, simulate, and debug Turing machines.
+        </p>
+      </header>
+
+      {/* Main content area: uses flex-1 to take up all remaining height */}
+      <div className="grid grid-cols-4 p-4 pt-0 h-[85vh]">
+        {/* Visual Canvas (3/4 width, static) */}
+        <div className="pr-2 col-span-3 h-full sticky top-0">
+          <VisualCanvas
+            states={states}
+            transitions={transitions}
+            alphabet={alphabet}
+            tapeAlphabet={tapeAlphabet}
+            currentState={machineState.currentState}
+            onStatesChange={setStates}
+            onTransitionsChange={setTransitions}
+          />
+        </div>
+
+        {/* Sidebar (1/4 width, scrollable) */}
+        <div className="pl-2 border-l col-span-1 border-slate-300 dark:border-slate-800 overflow-y-auto">
+          <div className="space-y-4 pb-4">
+            <ParametersPanel
+              alphabet={alphabet}
+              tapeAlphabet={tapeAlphabet}
+              blankSymbol={blankSymbol}
+              states={states}
+              transitions={transitions}
+              onAlphabetChange={setAlphabet}
+              onTapeAlphabetChange={setTapeAlphabet}
+              onBlankSymbolChange={setBlankSymbol}
+              onStatesChange={setStates}
+            />
+            <TapeVisualization
+              tape={machineState.tape}
+              headPosition={machineState.headPosition}
+              blankSymbol={blankSymbol}
+              inputString={inputString}
+              onInputChange={setInputString}
+              onInitialize={initializeTape}
+            />
+            <DebuggerControls
+              isRunning={machineState.isRunning}
+              isHalted={machineState.isHalted}
+              speed={speed}
+              onRun={handleRun}
+              onStep={executeStep}
+              onReset={handleReset}
+              onSpeedChange={setSpeed}
+            />
+            <TraceLog
+              steps={machineState.steps}
+              haltReason={machineState.haltReason}
+            />
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-green-400 bg-clip-text text-transparent">
-            Turing Machine Builder & Visualizer
-          </h1>
-          <p className="text-slate-400 mt-2">
-            Design, simulate, and debug Turing machines with a modern interface
-          </p>
-        </header>
-
-        <Tabs defaultValue="builder" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-slate-400 dark:bg-slate-900">
-            <TabsTrigger value="builder">Builder</TabsTrigger>
-            <TabsTrigger value="simulator">Simulator</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="builder" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 h-[600px]">
-                <VisualCanvas
-                  states={states}
-                  transitions={transitions}
-                  alphabet={alphabet}
-                  tapeAlphabet={tapeAlphabet}
-                  currentState={machineState.currentState}
-                  onStatesChange={setStates}
-                  onTransitionsChange={setTransitions}
-                />
-              </div>
-
-              <div className="space-y-4">
-                <ParametersPanel
-                  alphabet={alphabet}
-                  tapeAlphabet={tapeAlphabet}
-                  blankSymbol={blankSymbol}
-                  states={states}
-                  transitions={transitions}
-                  onAlphabetChange={setAlphabet}
-                  onTapeAlphabetChange={setTapeAlphabet}
-                  onBlankSymbolChange={setBlankSymbol}
-                  onStatesChange={setStates}
-                />
-              </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="simulator" className="space-y-4">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div className="lg:col-span-2 space-y-4">
-                <TapeVisualization
-                  tape={machineState.tape}
-                  headPosition={machineState.headPosition}
-                  blankSymbol={blankSymbol}
-                  inputString={inputString}
-                  onInputChange={setInputString}
-                  onInitialize={initializeTape}
-                />
-
-                <DebuggerControls
-                  isRunning={machineState.isRunning}
-                  isHalted={machineState.isHalted}
-                  speed={speed}
-                  onRun={handleRun}
-                  onStep={executeStep}
-                  onReset={handleReset}
-                  onSpeedChange={setSpeed}
-                />
-
-                <div className="h-[400px] lg:hidden">
-                  <TraceLog
-                    steps={machineState.steps}
-                    haltReason={machineState.haltReason}
-                  />
-                </div>
-              </div>
-
-              <div className="hidden lg:block h-[600px]">
-                <TraceLog
-                  steps={machineState.steps}
-                  haltReason={machineState.haltReason}
-                />
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
     </div>
   );

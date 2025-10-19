@@ -61,7 +61,7 @@ export function TransitionEdge({
     <>
       <path
         id={id}
-        className="react-flow__edge-path stroke-slate-600 hover:stroke-slate-900 dark:stroke-slate-400 dark:hover:stroke-slate-300 stroke-2"
+        className="react-flow__edge-path stroke-slate-600 hover:stroke-slate-900 dark:stroke-slate-400 dark:hover:stroke-slate-300 stroke-4"
         d={edgePath}
         markerEnd={markerEnd}
         style={{
