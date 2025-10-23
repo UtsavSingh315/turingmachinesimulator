@@ -16,7 +16,7 @@ export default function Home() {
   const [blankSymbol, setBlankSymbol] = useState<string>("B");
   const [states, setStates] = useState<TMState[]>([
     { id: "q0", label: "q0", type: "start" },
-    { id: "q_accept1", label: "q_accept1", type: "accept" },
+    { id: "q_f", label: "q_f", type: "accept" },
     { id: "q_reject1", label: "q_reject1", type: "reject" },
   ]);
   const [transitions, setTransitions] = useState<Transition[]>([]);
